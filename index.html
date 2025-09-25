@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Bank Files</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px;
+    }
+    .container {
+      width: 700px;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2A64F6;
+      margin-bottom: 20px;
+    }
+    .form-block {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      position: relative;
+      background: #fafafa;
+    }
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    /* ===== Custom Select ===== */
+    .select-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+      appearance: none;
+      background: white;
+    }
+    .select-wrapper::after {
+      content: "";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      background: url("data:image/svg+xml;utf8,<svg fill='%232A64F6' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat center;
+      background-size: contain;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    /* ===== File Upload ===== */
+    .custom-file {
+      display: inline-block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+      color: #2A64F6;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+      font-weight: 600;
+      background: #f9fbff;
+      box-sizing: border-box;
+    }
+    .custom-file:hover {
+      background: #2A64F6;
+      color: white;
+    }
+    .custom-file input[type="file"] {
+      display: none; /* ซ่อน input เดิม */
+    }
+    .file-list {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .file-list div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f1f1f1;
+      padding: 6px 10px;
+      margin: 4px 0;
+      border-radius: 6px;
+    }
+    .file-list button {
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 2px 8px;
+      cursor: pointer;
+    }
+
+    /* ===== Buttons ===== */
+    .add-btn {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #2A64F6;
+      border-radius: 10px;
+      background: #fff;
+      color: #2A64F6;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .submit-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2A64F6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Upload Bank Files</h2>
+    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+
+      <div id="formBlocks">
+        <div class="form-block">
+          <button type="button" class="remove-btn" onclick="removeBlock(this)" style="display:none;">x</button>
+          
+          <label>Company</label>
+          <div class="select-wrapper">
+            <select name="company[]" required>
+              <option value="">-- Select Company --</option>
+              <option value="Smartway">Smartway</option>
+              <option value="Intersend">Intersend</option>
+              <option value="Surepay">Surepay</option>
+              <option value="Wowpay">Wowpay</option>
+              <option value="Great">Great</option>
+              <option value="ITF">ITF</option>
+              <option value="Flexi">Flexi</option>
+            </select>
+          </div>
+
+          <label>Bank</label>
+          <div class="select-wrapper">
+            <select name="bank[]" required>
+              <option value="">-- Select Bank --</option>
+              <option value="KBank">KBank</option>
+              <option value="SCB">SCB</option>
+              <option value="TTB">TTB</option>
+              <option value="BBL">BBL</option>
+              <option value="BAY">BAY</option>
+              <option value="CIMB">CIMB</option>
+            </select>
+          </div>
+
+          <label>Upload Files</label>
+          <label class="custom-file">
+            <input type="file" name="files0" multiple required onchange="showFiles(this)">
+            📂 Choose Files
+          </label>
+          <div class="file-list"></div>
+        </div>
+      </div>
+
+      <button type="button" class="add-btn" onclick="addBlock()">+ Add Another Company</button>
+      <button type="submit" class="submit-btn">Upload</button>
+    </form>
+  </div>
+
+  <script>
+    let blockCount = 1;
+
+    function addBlock() {
+      const container = document.getElementById("formBlocks");
+      const firstBlock = container.querySelector(".form-block");
+      const newBlock = firstBlock.cloneNode(true);
+
+      // reset values
+      newBlock.querySelector(".file-list").innerHTML = "";
+      const inputFile = newBlock.querySelector("input[type=file]");
+      inputFile.value = "";
+      inputFile.setAttribute("name", "files" + blockCount);
+      blockCount++;
+
+      newBlock.querySelector(".remove-btn").style.display = "block";
+
+      container.appendChild(newBlock);
+    }
+
+    function removeBlock(btn) {
+      btn.parentElement.remove();
+    }
+
+    function showFiles(input) {
+      const list = input.closest(".form-block").querySelector(".file-list");
+      list.innerHTML = "";
+      for (let i = 0; i < input.files.length; i++) {
+        const file = input.files[i];
+        const div = document.createElement("div");
+        div.textContent = file.name;
+        const btn = document.createElement("button");
+        btn.textContent = "x";
+        btn.onclick = (e) => { e.preventDefault(); div.remove(); };
+        div.appendChild(btn);
+        list.appendChild(div);
+      }
+    }
+  </script>
+</body>
+</html>

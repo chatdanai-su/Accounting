@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Logs</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: #f9f9f9;
+      padding: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2A64F6;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #f1f1f1;
+      margin: 8px 0;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    a {
+      display: block;
+      margin-top: 15px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .back-btn {
+      color: #2A64F6;
+    }
+    .drive-btn {
+      background: #2A64F6;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📑 Upload Logs</h2>
+    {% if logs %}
+      <ul>
+        {% for line in logs %}
+          <li>{{ line }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No logs found for this session.</p>
+    {% endif %}
+    
+    <a href="{{ url_for('upload_file') }}" class="back-btn">⬅ Back to Upload</a>
+    <a href="https://drive.google.com/drive/folders/1lC28KVri3NzJ-XRuKcDYxl2-QocoUqS4" 
+       target="_blank" class="drive-btn">🌐 Open Shared Drive</a>
+  </div>
+</body>
+</html>

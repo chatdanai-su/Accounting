@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Processing Status</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 2em; }
+        h1 { color: #569cd6; }
+        #log-container { 
+            background-color: #252526; 
+            border: 1px solid #333; 
+            padding: 1em; 
+            height: 70vh; 
+            overflow-y: auto; 
+            white-space: pre-wrap; /* Allows text to wrap */
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        #log-container p { margin: 2px 0; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        Running Accounting Script... 
+        <div id="spinner" class="spinner"></div>
+    </h1>
+    <div id="log-container">
+        <p>Waiting for script to start...</p>
+    </div>
+
+    <script>
+        const logContainer = document.getElementById('log-container');
+        const spinner = document.getElementById('spinner');
+
+        // Create a connection to our streaming endpoint
+        const eventSource = new EventSource("/stream-logs");
+        let isFirstMessage = true;
+
+        // Listen for new messages from the server
+        eventSource.onmessage = function(event) {
+            // Special signal to close the connection
+            if (event.data === '[DONE]') {
+                spinner.style.display = 'none'; // Hide spinner
+                eventSource.close();
+                return;
+            }
+
+            // Clear the "Waiting..." message on the first real log
+            if (isFirstMessage) {
+                logContainer.innerHTML = '';
+                isFirstMessage = false;
+            }
+            
+            const p = document.createElement('p');
+            p.textContent = event.data;
+            logContainer.appendChild(p);
+
+            // Automatically scroll to the bottom
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+
+        // Handle errors
+        eventSource.onerror = function(err) {
+            console.error("EventSource failed:", err);
+            spinner.style.display = 'none';
+            const p = document.createElement('p');
+            p.textContent = '⚠️ Connection to server lost. Please check the console.';
+            p.style.color = '#ce9178';
+            logContainer.appendChild(p);
+            eventSource.close();
+        };
+    </script>
+</body>
+</html>
